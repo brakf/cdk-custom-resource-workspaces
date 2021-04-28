@@ -182,9 +182,6 @@ exports.handler = async (event: CloudFormationCustomResourceEvent, context: Cont
         directory: directoryId,
         domain: domain,
         endpointUrl: endpointUrl
-
-
-
     };
 
     console.log(workspaceProps);

@@ -3,14 +3,15 @@ import * as cdk from '@aws-cdk/core';
 import { CfnSimpleAD } from "@aws-cdk/aws-directoryservice";
 
 import { StringParameter } from "@aws-cdk/aws-ssm";
-import { ISubnet, Vpc } from "@aws-cdk/aws-ec2";
+import { ISubnet, IVpc, Vpc } from "@aws-cdk/aws-ec2";
 
 
 import { DirectoryRegistration, LDAPUser, LDAPUserProvider, Workspace, WorkspaceProvider } from "./trc-training-workspaces-custom-ressources";
+import { CfnParameter } from '@aws-cdk/core';
 interface WorkspacesSetupProps extends cdk.StackProps {
   adminUser: string,
   adminPasswordAD: string,
-  vpc: Vpc,
+  vpc: IVpc,
   subnets: ISubnet[],
   userAmount: number,
   bundleId: string,
@@ -21,68 +22,71 @@ interface WorkspacesSetupProps extends cdk.StackProps {
 
 const test = true;
 
+interface TrcTrainingWorkspacesStackProps extends cdk.StackProps {
+  vpc: string,
+  userAmount: number
+}
+
 export class TrcTrainingWorkspacesStack extends cdk.Stack {
-  constructor(scope: cdk.Construct, id: string) {
-    super(scope, id);
+  constructor(scope: cdk.Construct, id: string, props: TrcTrainingWorkspacesStackProps) {
+    super(scope, id, props);
 
 
-    var
-      testEnvironment = new TestEnvironment(this, "test");
+    const adminPasswordInput = new CfnParameter(this, "adminPasswordInput", {
+      default: "Admin123!Pass",
+      // allowedPattern: "^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#\$%\^&\*])(?=.{8,})",
+      description: "Password of AD-User 'Administrator'",
+      minLength: 8
+    });
 
+    // const vpcIdInput = new CfnParameter(this, "vpcId", {
+    //   description: "ID of provisioned VPC",
+    //   constraintDescription: "Requires private subnet with NAT Gateway",
 
+    // });
+
+    const bundeIdInput = new CfnParameter(this, "bundeIdInput", {
+      default: "wsb-5y88rt6x3",
+      description: "Workspace BundleId",
+    });
+    const domainInput = new CfnParameter(this, "domainInput", {
+      default: "dataanalytics.training.tecracer.de",
+      description: "Domain",
+    });
+    const baseDNInput = new CfnParameter(this, "baseDNInput", {
+      default: "CN=Users, DC=dataanalytics,DC=training,DC=tecracer,DC=de",
+      description: "Base DN of Active Directory. Based on Domain Name",
+    });
+    const defaultEmailAddressInput = new CfnParameter(this, "defaultEmailAddressInput", {
+      default: "noreply@tecracer.de",
+      description: "Email Adresses for AD users",
+    });
+
+    const vpc = Vpc.fromLookup(this, "vpc", {
+      vpcId: props?.vpc
+    });
 
     const workspacesProps: WorkspacesSetupProps = {
       adminUser: "Administrator",
-      adminPasswordAD: "Password123!",
-      vpc: testEnvironment.vpc,
-      // testEnvironment.vpc.vpcId,
-      //   Vpc.fromLookup(this, "vpc", {
-      //   vpcId: props.vpcID,
-
-      // })
-      subnets: testEnvironment.vpc.privateSubnets,
-      //   .map(subnet => {
-      //   return subnet.subnetId
-      // }),
-      userAmount: 2,
-      bundleId: "wsb-8vbljg4r6", //"wsb-5y88rt6x3",
-      domain: "dataanalytics.training.tecracer.de",
-      baseDN: "CN=Users, DC=dataanalytics,DC=training,DC=tecracer,DC=de",
-      defaultEmail: "noreply@tecracer.de"
+      adminPasswordAD: adminPasswordInput.value.toString(),
+      vpc: vpc,
+      subnets: vpc.privateSubnets,
+      userAmount: props.userAmount,
+      bundleId: bundeIdInput.value.toString(), //"wsb-5y88rt6x3",
+      domain: domainInput.value.toString(),
+      baseDN: baseDNInput.value.toString(),
+      defaultEmail: defaultEmailAddressInput.value.toString(),
+      env: {
+        account: props?.env?.account,
+        region: props?.env?.region
+      }
 
     }
     // The code that defines your stack goes here
     const workspacesSetup = new Setup(this, "Setup", workspacesProps);
-
-
-
-
-
-
   }
 }
-class TestEnvironment extends cdk.Construct {
 
-  vpc: Vpc;
-
-  constructor(scope: cdk.Construct, id: string) {
-
-    super(scope, id);
-
-
-
-    this.vpc = new Vpc(this, "test vpc", {
-
-    });
-
-
-
-
-
-
-  }
-
-}
 
 class Setup extends cdk.Construct {
   constructor(scope: cdk.Construct, id: string, props: WorkspacesSetupProps) {

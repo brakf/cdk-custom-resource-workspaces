@@ -7,7 +7,6 @@
   "scripts": {
     "build": "tsc",
     "watch": "tsc -w",
-    "test": "jest",
     "cdk": "cdk"
   },
   "devDependencies": {
@@ -30,7 +29,7 @@
     "@aws-cdk/core": "1.99.0",
     "@aws-cdk/custom-resources": "^1.99.0",
     "cdk": "^1.100.0",
-    "source-map-support": "^0.5.16",
-    "trc-training-workspace-operations": "file:../trc-training-workspace-operations"
+    "dotenv": "^8.2.0",
+    "source-map-support": "^0.5.16"
   }
 }

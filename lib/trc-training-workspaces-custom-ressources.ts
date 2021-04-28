@@ -5,7 +5,7 @@ import { Code, Function, Runtime } from "@aws-cdk/aws-lambda";
 import { Provider } from "@aws-cdk/custom-resources";
 
 import { StringParameter } from "@aws-cdk/aws-ssm";
-import { Vpc } from "@aws-cdk/aws-ec2";
+import { IVpc, Vpc } from "@aws-cdk/aws-ec2";
 
 import { Effect, PolicyStatement } from "@aws-cdk/aws-iam";
 // import { workspace_settings } from '../lambda/workspace-ressouce-handler/node_modules/trc-training-workspace-operations/trc-training-workspace-operations';
@@ -114,7 +114,7 @@ interface LDAPUserProviderProps {
     simpleAD: CfnSimpleAD,
     adminUser: string;
     adminPasswordParameter: StringParameter,
-    vpc: Vpc,
+    vpc: IVpc,
     baseDN: string;
     domain: string;
 }
@@ -133,7 +133,44 @@ export class LDAPUserProvider extends cdk.Construct {
     constructor(scope: cdk.Construct, id: string, props: LDAPUserProviderProps) {
         super(scope, id);
 
-        this.provider = this.CustomRessourceLDAPUser(props.simpleAD, props.adminPasswordParameter, props.vpc);
+        //create Handler Lamdba Function
+        const customRessourceHandler = new Function(this, "workspaceCreateLdapUser", {
+            runtime: Runtime.NODEJS_14_X,
+            handler: 'index.handler',
+            code: Code.fromAsset('lambda/workspace-create-ldap-user'),
+            logRetention: 3,
+            timeout: Duration.minutes(2),
+            vpc: props.vpc,
+            vpcSubnets:
+            {
+                subnets: props.vpc.privateSubnets
+            }
+
+        });
+
+        //provide proper authorizations to Lamdba Function
+        props.adminPasswordParameter.grantRead(customRessourceHandler);
+        customRessourceHandler.role?.addToPrincipalPolicy(new PolicyStatement({
+            actions: [
+                "ds:*",
+            ],
+            effect: Effect.ALLOW,
+            resources: ['*'],
+        }));
+
+        //add dependencies to other ressources that have to exists for the lamdba function to work properly
+        //deployment of the custom ressource will wait for those to be created.
+        customRessourceHandler.node.addDependency(props.vpc); //required to make sure NAT gateways do not get deleted before lamdba does.
+
+        // create actual provider
+        this.provider = new Provider(this, "provider", {
+            onEventHandler: customRessourceHandler,
+            vpc: props.vpc,
+        });
+
+
+
+        //store properties
         this.simpleAD = props.simpleAD;
         this.baseDN = props.baseDN;
         this.domain = props.domain;
@@ -142,52 +179,6 @@ export class LDAPUserProvider extends cdk.Construct {
         this.adminUser = props.adminUser
     }
 
-    CustomRessourceLDAPUser(simpleAD: CfnSimpleAD, adminPasswordParameter: StringParameter, vpc: Vpc): Provider {
-        const customRessourceHandler = new Function(this, "workspaceCreateLdapUser", {
-            runtime: Runtime.NODEJS_14_X,
-            handler: 'index.handler',
-            code: Code.fromAsset('lambda/workspace-create-ldap-user'),
-            logRetention: 3,
-            timeout: Duration.minutes(2),
-            vpc: vpc,
-            vpcSubnets:
-            {
-                subnets: vpc.privateSubnets
-            }
-
-        });
-
-
-
-        adminPasswordParameter.grantRead(customRessourceHandler);
-        customRessourceHandler.node.addDependency(vpc); //required to make sure NAT gateways do not get deleted before lamdba does.
-
-
-        customRessourceHandler.role?.addToPrincipalPolicy(new PolicyStatement({
-            actions: [
-
-                "ds:*",
-
-            ],
-            effect: Effect.ALLOW,
-            resources: ['*'],
-        }));
-
-        // const prefix = "workspaceCreateLdapUser";
-
-        const CustomRessourceProvider = new Provider(this, "provider", {
-            onEventHandler: customRessourceHandler,
-            vpc: vpc,
-
-
-        });
-
-
-
-        return CustomRessourceProvider;
-
-
-    }
 }
 
 interface LDAPUserProps {

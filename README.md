@@ -14,7 +14,10 @@ AWS_ACCOUNT=xxx
 AWS_REGION=eu-west-1
 AWS_VPC_ID=vpc-xxx
 AWS_USER_AMOUNT=4
+AWS_BUNDLEID=wsb-5y88rt6x3
 ```
+
+
 2. install dependencies
 ```
 npm install

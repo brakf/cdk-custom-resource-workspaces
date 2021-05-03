@@ -23,8 +23,8 @@ interface WorkspacesSetupProps extends cdk.StackProps {
 const test = true;
 
 interface TrcTrainingWorkspacesStackProps extends cdk.StackProps {
-  vpc: string,
-  userAmount: number
+  userAmount: number,
+  bundleId: string
 }
 
 export class TrcTrainingWorkspacesStack extends cdk.Stack {
@@ -46,7 +46,7 @@ export class TrcTrainingWorkspacesStack extends cdk.Stack {
     // });
 
     const bundeIdInput = new CfnParameter(this, "bundeIdInput", {
-      default: "wsb-5y88rt6x3",
+      default: props.bundleId, //"wsb-5y88rt6x3",
       description: "Workspace BundleId",
     });
     const domainInput = new CfnParameter(this, "domainInput", {
@@ -62,9 +62,11 @@ export class TrcTrainingWorkspacesStack extends cdk.Stack {
       description: "Email Adresses for AD users",
     });
 
-    const vpc = Vpc.fromLookup(this, "vpc", {
-      vpcId: props?.vpc
+    const vpc = new Vpc(this, "vpc", {
+      maxAzs: 2
+
     });
+
 
     const workspacesProps: WorkspacesSetupProps = {
       adminUser: "Administrator",

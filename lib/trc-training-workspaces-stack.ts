@@ -78,10 +78,10 @@ export class TrcTrainingWorkspacesStack extends cdk.Stack {
       domain: domainInput.value.toString(),
       baseDN: baseDNInput.value.toString(),
       defaultEmail: defaultEmailAddressInput.value.toString(),
-      env: {
-        account: props?.env?.account,
-        region: props?.env?.region
-      }
+      // env: {
+      //   account: props?.env?.account,
+      //   region: props?.env?.region
+      // }
 
     }
     // The code that defines your stack goes here

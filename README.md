@@ -10,15 +10,17 @@ This CDK Project allows automatic creation of all ressources required for a trai
 ## How to deploy
 1. Copy the *example.env* file to *.env* and modify the required parameters
 ```
-AWS_ACCOUNT=xxx
-AWS_REGION=eu-west-1
-AWS_VPC_ID=vpc-xxx
 AWS_USER_AMOUNT=4
-AWS_BUNDLEID=wsb-5y88rt6x3
+AWS_BUNDLEID=wsb-8vbljg4r6
 ```
 
+AWS_USER_AMOUNT refers to the amount of users to create. They will be called training01 - training 0n (password for each is username + !).
 
-2. install dependencies
+AWS_BUNDLEID refers to a AWS Workspaces Bundle that needs to be provided. Check the AWS documentation to find out more.
+
+
+
+2. install dependencies 
 ```
 npm install
 ```

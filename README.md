@@ -22,11 +22,14 @@ AWS_BUNDLEID refers to a AWS Workspaces Bundle that needs to be provided. Check 
 
 2. install dependencies and create transpile ts to js files
 
-    I provided a script that performs those steps on linux: 
+    I provided a script that performs those steps on linux.
+    It might show tsc errors for some aws-sdk modules. Those can be ignored.
 ```
 chmod a+x prepareRepoForDeployment.sh
 ./prepareRepoForDeployment.sh
 ```
+
+
 3. to deploy run
 ```
 cdk deploy
@@ -78,3 +81,11 @@ Afterwards you can verify it by checking the following in AWS Console:
     Web Access is possible via the following Link:
     https://clients.amazonworkspaces.com/webclient
 
+
+## Delete Stack
+To delete stack, run 
+```
+cdk destroy
+```
+
+-> Currently I am still facing an error that the VPC that gets created fails to delete... It currently has to be deleted manually after the delete job runs into a timeout. Probably some stupid dependency issue. Will look for a solution ASAP.

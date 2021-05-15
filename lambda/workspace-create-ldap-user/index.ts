@@ -48,7 +48,7 @@ exports.handler = async (event: CloudFormationCustomResourceEvent, context: Cont
         username = event.ResourceProperties["username"];
 
     } catch (error) {
-        var returndata: CloudFormationCustomResourceResponse = {
+        var returnData: CloudFormationCustomResourceResponse = {
             Status: "FAILED",
             Reason: "Not all Parameters Maintained",
             LogicalResourceId: event.LogicalResourceId,
@@ -57,8 +57,8 @@ exports.handler = async (event: CloudFormationCustomResourceEvent, context: Cont
             StackId: event.StackId
         };
 
-        console.log(JSON.stringify(returndata));
-        return returndata;
+        console.log(JSON.stringify(returnData));
+        return returnData;
     }
 
     //get endpoint Url
@@ -80,15 +80,15 @@ exports.handler = async (event: CloudFormationCustomResourceEvent, context: Cont
 
         // console.log("start api2");
         const getEndpointUrlResult = await dsClient.send(getEndpointUrlCommand).catch(error => {
-            console.log("error occured during api call");
+            console.log("error occurred during api call");
             throw error;
         });
         // console.log("end api");
         console.log(getEndpointUrlResult);
 
-        const directoryDescribtion = getEndpointUrlResult.DirectoryDescriptions;
-        if (directoryDescribtion !== undefined) {
-            const directory = directoryDescribtion[0];
+        const directoryDescription = getEndpointUrlResult.DirectoryDescriptions;
+        if (directoryDescription !== undefined) {
+            const directory = directoryDescription[0];
             if (directory !== undefined) {
                 endpoint = directory.DnsIpAddrs;
 
@@ -199,7 +199,7 @@ exports.handler = async (event: CloudFormationCustomResourceEvent, context: Cont
                     email: email
                 })
                 .then(() => {
-                    var returndata: CloudFormationCustomResourceSuccessResponse =
+                    var returnData: CloudFormationCustomResourceSuccessResponse =
                     {
                         Status: "SUCCESS",
                         Reason: "",
@@ -208,11 +208,11 @@ exports.handler = async (event: CloudFormationCustomResourceEvent, context: Cont
                         RequestId: event.RequestId,
                         StackId: event.StackId
                     };
-                    console.log(JSON.stringify(returndata));
-                    return returndata;
+                    console.log(JSON.stringify(returnData));
+                    return returnData;
                 })
                 .catch(error => {
-                    var returndata: CloudFormationCustomResourceFailedResponse =
+                    var returnData: CloudFormationCustomResourceFailedResponse =
                     {
                         Status: "FAILED",
                         Reason: JSON.stringify(error),
@@ -222,15 +222,15 @@ exports.handler = async (event: CloudFormationCustomResourceEvent, context: Cont
                         StackId: event.StackId
                     };
 
-                    console.log(JSON.stringify(returndata));
-                    return returndata;
+                    console.log(JSON.stringify(returnData));
+                    return returnData;
                 });
 
         case "Update":
 
 
             //
-            var returndatadelete: CloudFormationCustomResourceSuccessResponse =
+            var returnDataDelete: CloudFormationCustomResourceSuccessResponse =
             {
                 Status: "SUCCESS",
                 Reason: "No update took place (to be implemented)",
@@ -239,17 +239,17 @@ exports.handler = async (event: CloudFormationCustomResourceEvent, context: Cont
                 RequestId: event.RequestId,
                 StackId: event.StackId
             };
-            console.log(JSON.stringify(returndatadelete));
-            return returndatadelete;
+            console.log(JSON.stringify(returnDataDelete));
+            return returnDataDelete;
 
             break;
 
         case "Delete":
             //event.LogicalResourceId
 
-            //for now ommited. normally, user would automatically be deleted when directory gets deleted
+            //for now omitted. normally, user would automatically be deleted when directory gets deleted
 
-            var returndatadelete: CloudFormationCustomResourceSuccessResponse =
+            var returnDataDelete: CloudFormationCustomResourceSuccessResponse =
             {
                 Status: "SUCCESS",
                 Reason: "No deletion took place (by design)",
@@ -258,8 +258,8 @@ exports.handler = async (event: CloudFormationCustomResourceEvent, context: Cont
                 RequestId: event.RequestId,
                 StackId: event.StackId
             };
-            console.log(JSON.stringify(returndatadelete));
-            return returndatadelete;
+            console.log(JSON.stringify(returnDataDelete));
+            return returnDataDelete;
 
 
 

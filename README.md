@@ -1,10 +1,10 @@
 # Training Workspace Creation
 
-This CDK Project allows automatic creation of all ressources required for a training lab environment using AWS workspaces.
+This CDK Project allows automatic creation of all resources required for a training lab environment using AWS workspaces.
 
 ## Prerequisite:
 - An existing VPC with private subnets needs to exist. Those private subnets require access to AWS API Endpoints (e.g. via NAT Gateway)
-- NPM and CDK need to be installed on your local maschine
+- NPM and CDK need to be installed on your local machine
 - obtain AWS authorizations via CLI (e.g. via awsume)
 
 ## How to deploy
@@ -20,11 +20,14 @@ AWS_BUNDLEID refers to a AWS Workspaces Bundle that needs to be provided. Check 
 
 
 
-2. install dependencies 
+2. install dependencies and create transpile ts to js files
+
+    I provided a script that performs those steps on linux: 
 ```
-npm install
+chmod a+x prepareRepoForDeployment.sh
+./prepareRepoForDeployment.sh
 ```
-3. run
+3. to deploy run
 ```
 cdk deploy
 ```
@@ -38,7 +41,7 @@ Do you wish to deploy these changes (y/n)?
 Deployment will take some time (5 - 10 minutes).
 Afterwards you can verify it by checking the following in AWS Console:
 
-1. If Directory Registration was sucessful
+1. If Directory Registration was successful
 
     https://eu-west-1.console.aws.amazon.com/workspaces/home?region=eu-west-1#directories:directories
 

@@ -19,8 +19,8 @@ export interface workspace_props {
 }
 
 
-const wsclient = new WorkSpacesClient({});
-const dsclient = new DirectoryServiceClient({});
+const wsClient = new WorkSpacesClient({});
+const dsClient = new DirectoryServiceClient({});
 
 export async function setupTrainingWorkspaces(workspace_props: workspace_props, userAmount: number) {
 
@@ -86,8 +86,8 @@ export async function create_workspace(workspace_props: workspace_props, user: s
     console.log("creating workspace for user " + user);
     console.log(JSON.stringify(command));
 
-    const workspaceId = await wsclient.send(command).catch(error => {
-        console.log("error occured");
+    const workspaceId = await wsClient.send(command).catch(error => {
+        console.log("error occurred");
         console.log(error);
         throw error;
     })
@@ -128,7 +128,7 @@ export async function workspace_settings(directoryId: string) {
 
 
 
-    const result = await wsclient.send(register_command)
+    const result = await wsClient.send(register_command)
         .catch(error => {
             console.log("Error registering directory");
             console.log(error);
@@ -154,7 +154,7 @@ export async function workspace_settings(directoryId: string) {
             DeviceTypeChromeOs: "ALLOW",
         }
     });
-    const result2 = await wsclient.send(settings_command)
+    const result2 = await wsClient.send(settings_command)
         .catch(error => {
             console.log("Error setting access properties");
             console.log(error);
@@ -168,14 +168,10 @@ export async function workspace_settings(directoryId: string) {
 export async function create_user(workspace_props: workspace_props, user_props: user_info) {
 
     console.log(workspace_props);
-    // //get directory infos
-    // const get_dirinfos_command = new DescribeDirectoriesCommand({
-    //     DirectoryIds: [workspace_props.directory]
-    // });
-    // const directory_infos = await dsclient.send(get_dirinfos_command);
 
 
-    const ldapclient = new Client({
+
+    const ldapClient = new Client({
         strictDN: false,
         url: 'ldap://' + workspace_props.endpointUrl,
         timeout: 5000
@@ -183,11 +179,11 @@ export async function create_user(workspace_props: workspace_props, user_props: 
 
     try {
 
-        await ldapclient.bind("CN=" + workspace_props.adminUser + "," + workspace_props.baseDN, workspace_props.adminPassword);
+        await ldapClient.bind("CN=" + workspace_props.adminUser + "," + workspace_props.baseDN, workspace_props.adminPassword);
 
         console.log("connected");
 
-        await ldapclient.add("CN=" + user_props.username + ", " + workspace_props.baseDN, {
+        await ldapClient.add("CN=" + user_props.username + ", " + workspace_props.baseDN, {
             "sn": [user_props.username],
             "sAMAccountName": [user_props.username],
             "userPrincipalName": [user_props.username + "@" + workspace_props.domain],
@@ -201,7 +197,7 @@ export async function create_user(workspace_props: workspace_props, user_props: 
             .catch(err => {
                 console.log(err);
 
-                var errortext: string = err.message;
+                var errorText: string = err.message;
 
                 if (err.code = 68) {
                     //user already exists, that is ok.
@@ -225,7 +221,7 @@ export async function create_user(workspace_props: workspace_props, user_props: 
         console.log(ex);
         throw ex;
     } finally {
-        await ldapclient.unbind();
+        await ldapClient.unbind();
     }
 }
 
@@ -236,8 +232,8 @@ export async function change_pwd(user: string, password: string, directoryID: st
         UserName: user,
         NewPassword: password
     })
-    const result = await dsclient.send(chg_password_command).catch(error => {
-        console.log("error occured");
+    const result = await dsClient.send(chg_password_command).catch(error => {
+        console.log("error occurred");
         console.log(error);
         throw error;
     })
@@ -263,7 +259,7 @@ export async function delete_all_workspaces(directoryId: string) {
 
     var term_requests: Array<TerminateRequest>;
 
-    const get_result = await wsclient.send(get_command)
+    const get_result = await wsClient.send(get_command)
 
         .catch(error => {
             console.error("error during api call");
@@ -299,10 +295,10 @@ export async function delete_all_workspaces(directoryId: string) {
     const register_command = new TerminateWorkspacesCommand({
         TerminateWorkspaceRequests: term_requests
     })
-    // console.log(JSON.stringify(await wsclient.send(register_command)));
+    // console.log(JSON.stringify(await wsClient.send(register_command)));
 
-    const result = await wsclient.send(register_command).catch(error => {
-        console.log("error occured");
+    const result = await wsClient.send(register_command).catch(error => {
+        console.log("error occurred");
         console.log(error);
         throw error;
     })
@@ -336,10 +332,10 @@ export async function delete_workspace(workspaceId: string) {
     const delete_command = new TerminateWorkspacesCommand({
         TerminateWorkspaceRequests: term_requests
     })
-    // console.log(JSON.stringify(await wsclient.send(register_command)));
+    // console.log(JSON.stringify(await wsClient.send(register_command)));
 
-    const result = await wsclient.send(delete_command).catch(error => {
-        console.log("error occured");
+    const result = await wsClient.send(delete_command).catch(error => {
+        console.log("error occurred");
         console.log(error);
         throw error;
     })
@@ -358,14 +354,14 @@ export async function deregister_directory(directoryId: string) {
 
     //then deregister
     //register directory
-    console.log("deregistering directory");
+    console.log("de-registering directory");
     const deregister_command = new DeregisterWorkspaceDirectoryCommand({
         DirectoryId: directoryId
     });
-    // console.log(JSON.stringify(await wsclient.send(deregister_command)));
+    // console.log(JSON.stringify(await wsClient.send(deregister_command)));
 
-    const result = await wsclient.send(deregister_command).catch(error => {
-        console.log("error occured");
+    const result = await wsClient.send(deregister_command).catch(error => {
+        console.log("error occurred");
         console.log(error);
         throw error;
     })

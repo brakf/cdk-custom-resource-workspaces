@@ -1,7 +1,7 @@
 {
   "name": "workspace-create-ldap-user",
   "version": "1.0.0",
-  "description": "Lamdba to create ldap users ",
+  "description": "Lambda to create user via ldap",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"

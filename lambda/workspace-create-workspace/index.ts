@@ -42,7 +42,7 @@ exports.handler = async (event: CloudFormationCustomResourceEvent, context: Cont
         runningMode = event.ResourceProperties["runningMode"];
 
     } catch (error) {
-        var returndata: CloudFormationCustomResourceResponse = {
+        var returnData: CloudFormationCustomResourceResponse = {
             Status: "FAILED",
             Reason: "Not all Parameters Maintained",
             LogicalResourceId: event.LogicalResourceId,
@@ -51,8 +51,8 @@ exports.handler = async (event: CloudFormationCustomResourceEvent, context: Cont
             StackId: event.StackId
         };
 
-        console.log(JSON.stringify(returndata));
-        return returndata;
+        console.log(JSON.stringify(returnData));
+        return returnData;
     }
 
 
@@ -81,7 +81,7 @@ exports.handler = async (event: CloudFormationCustomResourceEvent, context: Cont
             console.log("create workspace");
             return await trc_ws_ops.create_workspace(workspaceProps, userName)
                 .then((workspaceId) => {
-                    var returndata: CloudFormationCustomResourceSuccessResponse =
+                    var returnData: CloudFormationCustomResourceSuccessResponse =
                     {
                         Status: "SUCCESS",
                         Reason: "",
@@ -90,11 +90,11 @@ exports.handler = async (event: CloudFormationCustomResourceEvent, context: Cont
                         RequestId: event.RequestId,
                         StackId: event.StackId
                     };
-                    console.log(JSON.stringify(returndata));
-                    return returndata;
+                    console.log(JSON.stringify(returnData));
+                    return returnData;
                 })
                 .catch(error => {
-                    var returndata: CloudFormationCustomResourceFailedResponse =
+                    var returnData: CloudFormationCustomResourceFailedResponse =
                     {
                         Status: "FAILED",
                         Reason: JSON.stringify(error),
@@ -104,13 +104,13 @@ exports.handler = async (event: CloudFormationCustomResourceEvent, context: Cont
                         StackId: event.StackId
                     };
 
-                    console.log(JSON.stringify(returndata));
-                    return returndata;
+                    console.log(JSON.stringify(returnData));
+                    return returnData;
                 });
 
         case "Update":
 
-            var returndataupdate: CloudFormationCustomResourceSuccessResponse =
+            var returnDataUpdate: CloudFormationCustomResourceSuccessResponse =
             {
                 Status: "SUCCESS",
                 Reason: "No update function defined",
@@ -119,8 +119,8 @@ exports.handler = async (event: CloudFormationCustomResourceEvent, context: Cont
                 RequestId: event.RequestId,
                 StackId: event.StackId
             };
-            console.log(JSON.stringify(returndataupdate));
-            return returndataupdate;
+            console.log(JSON.stringify(returnDataUpdate));
+            return returnDataUpdate;
             break;
 
         case "Delete":
@@ -130,7 +130,7 @@ exports.handler = async (event: CloudFormationCustomResourceEvent, context: Cont
 
             return await trc_ws_ops.delete_workspace(event.PhysicalResourceId)
                 .then(() => {
-                    var returndata: CloudFormationCustomResourceSuccessResponse =
+                    var returnData: CloudFormationCustomResourceSuccessResponse =
                     {
                         Status: "SUCCESS",
                         Reason: "",
@@ -139,12 +139,12 @@ exports.handler = async (event: CloudFormationCustomResourceEvent, context: Cont
                         RequestId: event.RequestId,
                         StackId: event.StackId
                     };
-                    console.log(JSON.stringify(returndata));
-                    return returndata;
+                    console.log(JSON.stringify(returnData));
+                    return returnData;
                 })
 
                 .catch(err => {
-                    var returndata: CloudFormationCustomResourceFailedResponse =
+                    var returnData: CloudFormationCustomResourceFailedResponse =
                     {
                         Status: "FAILED",
                         Reason: JSON.stringify(err),
@@ -154,8 +154,8 @@ exports.handler = async (event: CloudFormationCustomResourceEvent, context: Cont
                         StackId: event.StackId
                     };
 
-                    console.log(JSON.stringify(returndata));
-                    return returndata;
+                    console.log(JSON.stringify(returnData));
+                    return returnData;
                 });
 
 

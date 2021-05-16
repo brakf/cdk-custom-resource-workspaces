@@ -116,7 +116,7 @@ class Setup extends cdk.Construct {
       })
 
     const directoryRegistration = new DirectoryRegistration(this, "DirectoryRegistration");
-    directoryRegistration.Register(simpleAD);
+    directoryRegistration.Register(simpleAD, props.vpc);
 
     const lDAPUserProvider = new LDAPUserProvider(this, "LDAPUserProvider", {
       adminUser: props.adminUser,
@@ -146,7 +146,10 @@ class Setup extends cdk.Construct {
         provider: workspaceProvider,
         user: ldapUser,
         bundleId: props.bundleId
-      });
+      }, props.vpc);
+
+
+
     });
 
 

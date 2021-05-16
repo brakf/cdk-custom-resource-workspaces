@@ -9,7 +9,7 @@ import { IVpc, Vpc } from "@aws-cdk/aws-ec2";
 
 import { Effect, PolicyStatement } from "@aws-cdk/aws-iam";
 // import { workspace_settings } from '../lambda/workspace-ressouce-handler/node_modules/trc-training-workspace-operations/trc-training-workspace-operations';
-import { CustomResource, Duration } from '@aws-cdk/core';
+import { CustomResource, Duration, validateString } from '@aws-cdk/core';
 
 interface WorkspaceProviderProps {
     simpleAD: CfnSimpleAD,
@@ -82,7 +82,7 @@ interface WorkspaceProps {
 export class Workspace extends cdk.Construct {
     Ressource: CustomResource;
 
-    constructor(scope: cdk.Construct, id: string, props: WorkspaceProps) {
+    constructor(scope: cdk.Construct, id: string, props: WorkspaceProps, vpc?: IVpc) {
         super(scope, id);
 
         if (props.runningMode === undefined) {
@@ -102,6 +102,10 @@ export class Workspace extends cdk.Construct {
         });
 
         this.Ressource.node.addDependency(props.user)
+        if (vpc != undefined) {
+            this.Ressource.node.addDependency(vpc);
+        }
+
 
 
     }
@@ -303,7 +307,7 @@ export class DirectoryRegistration extends cdk.Construct {
 
     }
 
-    Register(simpleAD: CfnSimpleAD) {
+    Register(simpleAD: CfnSimpleAD, vpc: IVpc) {
         this.workspaceRegistration = new CustomResource(this, "WorkspaceSetup", {
             serviceToken: this.provider.serviceToken,
             properties: {
@@ -312,6 +316,7 @@ export class DirectoryRegistration extends cdk.Construct {
         });
 
         this.workspaceRegistration.node.addDependency(simpleAD);
+        this.workspaceRegistration.node.addDependency(vpc);
     }
 
 }

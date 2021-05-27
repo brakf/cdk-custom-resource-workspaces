@@ -89,3 +89,9 @@ cdk destroy
 ```
 
 -> Currently I am still facing an error that the VPC that gets created fails to delete... It currently has to be deleted manually after the delete job runs into a timeout. Probably some stupid dependency issue. Will look for a solution ASAP.
+
+## Open Bugs
+- Stack Deletion fails due to some dependency of the VPC
+- Bugs in AWS API: 
+- 1. Web Access is not allowed automatically (described above)
+- 2. Workspaces occasionally get launched into a public subnet. There is not explaination but it being a bug in AWS as well.
